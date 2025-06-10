@@ -1,33 +1,26 @@
-from flask import Flask, request, jsonify
+import streamlit as st
 import joblib
-import pandas as pd
-
-app = Flask(__name__)
+import numpy as np
 
 # Load the trained model
-model = joblib.load('model.pkl')
+model = joblib.load("model.pkl")
 
-# You need to know the order and names of features your model expects
-feature_columns = ['feature1', 'feature2', 'feature3']  # Replace with your actual feature column names
+# Define expected features
+feature_columns = ['feature1', 'feature2', 'feature3']
 
-@app.route('/')
-def home():
-    return "Welcome to the ML Prediction API"
+st.title("Credit Card Default Predictor")
 
-@app.route('/predict', methods=['POST'])
-def predict():
-    data = request.json
+# Create inputs dynamically
+user_input = {}
+for feature in feature_columns:
+    user_input[feature] = st.number_input(f"Enter value for {feature}", value=0.0)
+
+# Prediction button
+if st.button("Predict"):
     try:
-        # Extract features from JSON in the correct order
-        features = [data[col] for col in feature_columns]
-    except KeyError as e:
-        return jsonify({"error": f"Missing feature in input: {e}"}), 400
-
-    # Convert features into a 2D array for prediction
-    prediction = model.predict([features])
-
-    return jsonify({'prediction': int(prediction[0])})
-
-if __name__ == '__main__':
-    app.run(debug=True, use_reloader=False)
-
+        features = [user_input[feature] for feature in feature_columns]
+        prediction = model.predict([features])[0]
+        result = "Will Default" if prediction == 1 else "No Default"
+        st.success(f"Prediction: {result}")
+    except Exception as e:
+        st.error(f"Error in prediction: {e}")
