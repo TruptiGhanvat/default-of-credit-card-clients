@@ -6,7 +6,7 @@ import numpy as np
 model = joblib.load("model.pkl")
 
 # Define expected features
-feature_columns = ['feature1', 'feature2', 'feature3']
+feature_columns = ['feature1', 'feature2', 'feature3', 'feature4', 'feature5', 'feature6']
 
 st.title("Credit Card Default Predictor")
 
